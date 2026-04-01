@@ -66,9 +66,9 @@ dig axfr @[TARGET_IP] [TARGET_DOMAIN]
 
 ```bash
 # Full enum + brute force subdomains
-dnsenum [TARGET_DOMAIN]
-dnsenum --enum [TARGET_DOMAIN]
-dnsenum --dnsserver [NAMESERVER_IP] [TARGET_DOMAIN]
+dnsenum [TARGET_DOMAIN] # Quick discovery of basic public records and common subdomains
+dnsenum --enum [TARGET_DOMAIN] # Deep-dive reconnaissance
+dnsenum --dnsserver [NAMESERVER_IP] [TARGET_DOMAIN] # Forcing a query against a specific server (e.g., a misconfigured secondary NS)
 
 # With subdomain wordlist
 dnsenum --enum -f /usr/share/wordlists/dnsmap.txt [TARGET_DOMAIN]
@@ -144,7 +144,7 @@ whatweb -a 3 http://[TARGET_DOMAIN]   # aggression level 3
 whatweb -a 3 http://[TARGET_DOMAIN] --log-verbose=whatweb.txt
 ```
 
-### `wafw00f`
+### `wafw00f` Discover WAF
 
 ```bash
 wafw00f http://[TARGET_DOMAIN]

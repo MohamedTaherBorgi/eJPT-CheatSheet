@@ -190,12 +190,12 @@ enum4linux-ng [TARGET_IP] -A -u [USER] -p [PASS]
 ```bash
 # List shares (null session)
 smbclient -L //[TARGET_IP]
-smbclient -L //[TARGET_IP] -N                           # no password
+smbclient -L //[TARGET_IP] -N              # no password
 smbclient -L //[TARGET_IP] -U [USER]
 
 # Connect to share
 smbclient //[TARGET_IP]/[SHARE]
-smbclient //[TARGET_IP]/[SHARE] -N
+smbclient //[TARGET_IP]/[SHARE] -N         # no password
 smbclient //[TARGET_IP]/[SHARE] -U [USER]%[PASS]
 
 # Inside smbclient shell:
@@ -238,7 +238,7 @@ crackmapexec smb [TARGET_IP] -u [USER] -p [PASS] -x "whoami"
 crackmapexec smb [TARGET_IP] -u [USER] -p [PASS] -X "Get-ComputerInfo"
 ```
 
-### `smbmap`
+### `smbmap` Permission enumeration
 
 ```bash
 smbmap -H [TARGET_IP]
@@ -251,6 +251,14 @@ smbmap -H [TARGET_IP] -u '' -p ''                       # null session
 
 ## 5️⃣ SNMP ENUMERATION (Port 161 UDP)
 
+**SNMP (Simple Network Management Protocol)** is the "standard language" used by network devices (routers, switches, servers, printers, etc.) to communicate status information to a central management system.
+### The Attack Flow
+
+1. **Discovery:** Use `nmap -sU -p 161 [IP]` to see if the SNMP port (UDP 161) is open.
+    
+2. **Brute-Force:** Use `onesixtyone` with a wordlist to find the "Community String."
+    
+3. **Enumeration:** Use `snmp-check` or `snmpwalk` to dump the entire system configuration.
 ### `onesixtyone`
 
 ```bash
@@ -261,6 +269,11 @@ onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt [TARGET_IP]
 onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt -i hosts.txt
 ```
 
+| **Version** | **Security Level** | **Red Team Context**                                                                                                                           |
+| ----------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **v1**      | **None**           | Uses "Community Strings" (passwords) sent in **cleartext**. Extremely vulnerable to sniffing.                                                  |
+| **v2c**     | **None**           | Same as v1 but adds "Bulk" transfers. Still uses cleartext Community Strings. **This is the most common version you will find misconfigured.** |
+| **v3**      | **High**           | Adds encryption and actual Username/Password authentication. Much harder to exploit.                                                           |
 ### `snmpwalk`
 
 ```bash
@@ -276,6 +289,7 @@ snmpwalk -c public -v1 [TARGET_IP] 1.3.6.1.2.1.6.13.1.3     # open TCP ports
 snmpwalk -c public -v1 [TARGET_IP] 1.3.6.1.2.1.25.1.6.0     # system processes
 ```
 
+## OR
 ### `snmp-check`
 
 ```bash
@@ -353,6 +367,7 @@ rdesktop -u [USER] -p [PASS] [TARGET_IP]
 
 ## 9️⃣ SMTP ENUMERATION (Port 25)
 
+
 ```bash
 # nmap
 nmap --script smtp-enum-users,smtp-commands,smtp-vuln* -p 25 [TARGET_IP]
@@ -368,6 +383,8 @@ smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.
 smtp-user-enum -M RCPT -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t [TARGET_IP]
 smtp-user-enum -M EXPN -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t [TARGET_IP]
 ```
+
+#### SMTP is for **sending**, POP3/IMAP are for **reading**.
 
 ---
 
@@ -478,9 +495,13 @@ wfuzz -c -w wordlist.txt -H "Authorization: FUZZ" http://[TARGET_IP]/api
 ## 1️⃣2️⃣ BANNER GRABBING
 
 ```bash
-nc -nv [TARGET_IP] [PORT]
+# on NON encrypted ports
+nc -nv [TARGET_IP] [PORT] # BEST
 telnet [TARGET_IP] [PORT]
 curl -sv telnet://[TARGET_IP]:[PORT]
+
+# on encrypted ports
+openssl s_client -connect [TARGET_IP]:[PORT] -quiet
 
 # Multiple ports
 for port in 21 22 25 80 110 143 443 445 3306 3389 8080; do
