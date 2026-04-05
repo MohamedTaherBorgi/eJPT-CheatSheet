@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "🟣 Phase 5 Post-Exploitation.md",
+                "file": "Phase 8 Scripting, Evasion & Shells.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "🟣 Phase 5 Post-Exploitation"
+              "title": "Phase 8 Scripting, Evasion & Shells"
             }
           }
         ]
@@ -40,7 +40,7 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "byModifiedTimeReverse",
+                "sortOrder": "alphabeticalReverse",
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "ftp",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -183,17 +183,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "388cef81cf6bc0ce",
+  "active": "51a64e76be3ed38b",
   "lastOpenFiles": [
-    "🟢 Phase 7 Lateral Movement & Pivoting.md",
-    "🟣 Phase 5 Post-Exploitation.md",
-    "🔴 Phase 4 Exploitation.md",
-    "🔴 Phase 6 Privilege Escalation (Windows).md",
-    "🔴 Phase 6 Privilege Escalation (Linux).md",
-    "⚪ Phase 8 Scripting, Evasion & Shells.md",
-    "🟡 Phase 3 Vulnerability Analysis.md",
-    "🟢 Phase 2 Scanning & Active Enumeration.md",
-    "🔵 Phase 1 Recon & Info Gathering.md",
+    "Phase 7 Lateral Movement & Pivoting.md",
+    "Phase 6 Privilege Escalation (Linux).md",
+    "Phase 6 Privilege Escalation (Windows).md",
+    "Phase 5 Post-Exploitation.md",
+    "Phase 4 Exploitation.md",
+    "Phase 3 Vulnerability Analysis.md",
+    "Phase 2 Scanning & Active Enumeration.md",
+    "Phase 1 Recon & Info Gathering.md",
+    "Pivoting Confusions.md",
+    "Phase 8 Scripting, Evasion & Shells.md",
     "Untitled.canvas",
     "2026-03-30.md",
     "Untitled 1.base",
